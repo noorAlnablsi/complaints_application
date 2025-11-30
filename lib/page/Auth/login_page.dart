@@ -107,6 +107,9 @@
 import 'package:complaints_application/core/color.dart';
 import 'package:complaints_application/core/widget/app_button.dart';
 import 'package:complaints_application/core/widget/app_textfield.dart';
+import 'package:complaints_application/model/AuthModel/login_model.dart';
+import 'package:complaints_application/page/Auth/homepage.dart';
+import 'package:complaints_application/service/AuthService/login_service.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -118,9 +121,10 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _contactController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController contactController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                 AppTextField(
                   labelText: "البريد الإلكتروني أو الهاتف",
                   hintText: "أدخل البريد الإلكتروني أو رقم الهاتف",
-                  controller: _contactController,
+                  controller: contactController,
                   myIcon: const Icon(Icons.contact_mail, color: AppColors.primary),
                   validator: (value) {
                     if (value == null || value.isEmpty) return "الرجاء إدخال البريد الإلكتروني أو الهاتف";
@@ -159,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
                 AppTextField(
                   labelText: "كلمة المرور",
                   hintText: "أدخل كلمة المرور",
-                  controller: _passwordController,
+                  controller: passwordController,
                   obscureText: _obscurePassword,
                   myIcon: const Icon(Icons.lock, color: AppColors.primary),
                   traillingIcon: IconButton(
@@ -179,16 +183,50 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 30),
 
+                // AppButton(
+                //   text: "تسجيل الدخول",
+                //   onTap: () {
+                //     if (_formKey.currentState!.validate()) {
+                //       print("تم التحقق من الحقول، تسجيل الدخول...");
+                //     }
+                //   },
+                //   width: double.infinity,
+                //   height: 50,
+                // ),
                 AppButton(
-                  text: "تسجيل الدخول",
-                  onTap: () {
-                    if (_formKey.currentState!.validate()) {
-                      print("تم التحقق من الحقول، تسجيل الدخول...");
-                    }
-                  },
-                  width: double.infinity,
-                  height: 50,
-                ),
+  text: "تسجيل الدخول",
+  onTap: () async {
+    if (_formKey.currentState!.validate()) {
+      setState(() => isLoading = true);
+
+      final loginModel = LoginModel(
+        identifier: contactController.text,
+        password: passwordController.text,
+      );
+
+      final success = await AuthService().login(loginInfo: loginModel);
+
+      setState(() => isLoading = false);
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم تسجيل الدخول بنجاح')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Homepage ()), // صفحة بعد تسجيل الدخول
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('فشل تسجيل الدخول، تحقق من البريد أو كلمة المرور')),
+        );
+      }
+    }
+  },
+  width: double.infinity,
+  height: 50,
+),
+
               ],
             ),
           ),

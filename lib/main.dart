@@ -1,4 +1,5 @@
 import 'package:complaints_application/page/Auth/welcome_page.dart';
+import 'package:complaints_application/page/HomePage/home_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: WelcomePage(), // This trailing comma makes auto-formatting nicer for build methods.
+      home:ComplaintStepOne (), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
